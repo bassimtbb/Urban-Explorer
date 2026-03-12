@@ -7,9 +7,14 @@ const API_URL =
 export const fetchLieux = async (): Promise<Lieu[]> => {
   try {
     const response = await axios.get(`${API_URL}?limit=30`);
+
+    if (!response.data || !response.data.results) {
+      return [];
+    }
+
     return response.data.results;
   } catch (error) {
-    console.error('Erreur lors de la récupération des lieux:', error);
-    throw error;
+    console.error('Erreur API:', error);
+    return [];
   }
 };
