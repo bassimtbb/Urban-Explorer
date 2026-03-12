@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { Lieu } from '../types';
 
 interface Props {
@@ -9,21 +10,31 @@ interface Props {
 
 export default function LieuCard({ lieu, onPress }: Props) {
   return (
-    <View style={styles.card}>
-      <Image
-        source={{ uri: `https://picsum.photos/200?random=${lieu.nom_usuel}` }}
-        style={styles.image}
-      />
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
+      {lieu.cover_url ? (
+        <Image
+          source={{ uri: lieu.cover_url }}
+          style={styles.image}
+          transition={500}
+          contentFit="cover"
+          placeholder={{ blurhash: 'LKO2?U%2Tw=w]~RBVZRi};RPxuwH' }}
+        />
+      ) : (
+        <View style={[styles.image, styles.placeholder]}>
+          <Text style={styles.placeholderText}>📷</Text>
+        </View>
+      )}
 
       <View style={styles.content}>
-        <Text style={styles.title}>{lieu.nom_usuel}</Text>
-        <Text style={styles.address}>{lieu.adresse}</Text>
-
-        <TouchableOpacity style={styles.button} onPress={onPress}>
-          <Text style={styles.buttonText}>Voir plus</Text>
-        </TouchableOpacity>
+        <Text style={styles.title} numberOfLines={2}>{lieu.title}</Text>
+        <Text style={styles.address} numberOfLines={1}>
+          📍 {lieu.address_street}, {lieu.address_zipcode} {lieu.address_city}
+        </Text>
+        {lieu.lead_text ? (
+          <Text style={styles.lead} numberOfLines={2}>{lieu.lead_text}</Text>
+        ) : null}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -31,40 +42,43 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     marginBottom: 16,
-    borderRadius: 10,
+    borderRadius: 12,
     overflow: 'hidden',
     elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-
   image: {
     width: '100%',
-    height: 150,
+    height: 160,
   },
-
+  placeholder: {
+    backgroundColor: '#E1E9EE',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    fontSize: 40,
+  },
   content: {
-    padding: 12,
+    padding: 14,
   },
-
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#1C1C1E',
   },
-
   address: {
-    color: '#555',
+    fontSize: 13,
+    color: '#8E8E93',
     marginTop: 4,
   },
-
-  button: {
-    marginTop: 10,
-    backgroundColor: '#007AFF',
-    padding: 8,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
-  },
-
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  lead: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 8,
+    lineHeight: 20,
   },
 });

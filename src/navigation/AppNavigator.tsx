@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+import { Lieu } from '../types';
 
 import DecouverteScreen from '../screens/DecouverteScreen';
 import CarteScreen from '../screens/CarteScreen';
@@ -11,7 +12,7 @@ import DetailsScreen from '../screens/DetailsScreen';
 // ----- Types de navigation -----
 export type RootStackParamList = {
   DecouverteTab: undefined;
-  Details: undefined;
+  Details: { lieu: Lieu };
 };
 
 export type BottomTabParamList = {

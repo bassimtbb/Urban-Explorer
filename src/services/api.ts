@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Lieu } from '../types';
 
 const API_URL =
-  'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/lieux-culturels-a-paris/records';
+  'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records';
 
 export const fetchLieux = async (): Promise<Lieu[]> => {
   try {
