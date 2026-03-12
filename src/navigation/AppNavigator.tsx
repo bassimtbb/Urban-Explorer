@@ -7,6 +7,7 @@ import { Lieu } from '../types';
 import DecouverteScreen from '../screens/DecouverteScreen';
 import CarteScreen from '../screens/CarteScreen';
 import ProfilScreen from '../screens/ProfilScreen';
+import PlanningScreen from '../screens/PlanningScreen';
 import DetailsScreen from '../screens/DetailsScreen';
 
 // ----- Types de navigation -----
@@ -18,6 +19,7 @@ export type RootStackParamList = {
 export type BottomTabParamList = {
   DecouverteStack: undefined;
   Carte: undefined;
+  MesVisites: undefined;
   MonProfil: undefined;
 };
 
@@ -60,6 +62,8 @@ export default function AppNavigator() {
             iconName = focused ? 'list' : 'list-outline';
           } else if (route.name === 'Carte') {
             iconName = focused ? 'map' : 'map-outline';
+          } else if (route.name === 'MesVisites') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
           } else if (route.name === 'MonProfil') {
             iconName = focused ? 'person' : 'person-outline';
           }
@@ -88,6 +92,11 @@ export default function AppNavigator() {
         name="Carte"
         component={CarteScreen}
         options={{ title: 'Carte' }}
+      />
+      <Tab.Screen
+        name="MesVisites"
+        component={PlanningScreen}
+        options={{ title: 'Mes Visites' }}
       />
       <Tab.Screen
         name="MonProfil"

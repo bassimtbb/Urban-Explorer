@@ -4,11 +4,13 @@ import { View, Text, StyleSheet, FlatList, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { fetchLieux } from '../services/api';
 import { Lieu } from '../types';
+import { useVisits } from '../contexts/VisitContext';
 import LieuCard from '../components/LieuCard';
 import LieuCardSkeleton from '../components/LieuCardSkeleton';
 
 export default function DecouverteScreen() {
   const navigation = useNavigation<any>();
+  const { getPlannedDate } = useVisits();
 
   const [lieux, setLieux] = useState<Lieu[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,6 +64,7 @@ export default function DecouverteScreen() {
         renderItem={({ item }) => (
           <LieuCard
             lieu={item}
+            plannedDate={getPlannedDate(item.id)}
             onPress={() => navigation.navigate('Details', { lieu: item })}
           />
         )}

@@ -6,24 +6,39 @@ import { Lieu } from '../types';
 interface Props {
   lieu: Lieu;
   onPress: () => void;
+  plannedDate?: string;
 }
 
-export default function LieuCard({ lieu, onPress }: Props) {
+const formatDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+};
+
+export default function LieuCard({ lieu, onPress, plannedDate }: Props) {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
-      {lieu.cover_url ? (
-        <Image
-          source={{ uri: lieu.cover_url }}
-          style={styles.image}
-          transition={500}
-          contentFit="cover"
-          placeholder={{ blurhash: 'LKO2?U%2Tw=w]~RBVZRi};RPxuwH' }}
-        />
-      ) : (
-        <View style={[styles.image, styles.placeholder]}>
-          <Text style={styles.placeholderText}>📷</Text>
-        </View>
-      )}
+      <View style={styles.imageWrapper}>
+        {lieu.cover_url ? (
+          <Image
+            source={{ uri: lieu.cover_url }}
+            style={styles.image}
+            transition={500}
+            contentFit="cover"
+            placeholder={{ blurhash: 'LKO2?U%2Tw=w]~RBVZRi};RPxuwH' }}
+          />
+        ) : (
+          <View style={[styles.image, styles.placeholder]}>
+            <Text style={styles.placeholderText}>📷</Text>
+          </View>
+        )}
+
+        {/* Badge date planifiée */}
+        {plannedDate ? (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>🗓️ Prévu le : {formatDate(plannedDate)}</Text>
+          </View>
+        ) : null}
+      </View>
 
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={2}>{lieu.title}</Text>
@@ -50,6 +65,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+  imageWrapper: {
+    position: 'relative',
+  },
   image: {
     width: '100%',
     height: 160,
@@ -61,6 +79,20 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 40,
+  },
+  badge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(0, 173, 245, 0.9)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
   },
   content: {
     padding: 14,
