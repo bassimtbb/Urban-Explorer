@@ -3,6 +3,16 @@
 ## 📖 Présentation
 **Urban Explorer** est une application mobile de type "City Guide" centralisée sur la ville de Paris. 
 Son but principal est pédagogique : elle permet d'apprendre et de démontrer l'intégration robuste de multiples fonctionnalités natives (Caméra, Géolocalisation, Calendrier) au sein d'une application React Native (Expo) moderne.
+---
+
+## 👥 L'Équipe et Répartition des Tâches
+
+| Étudiant | Rôle principal | Tâches clés |
+|----------|---------------|-------------|
+| **Bassim TABBEB** | | |
+| **Celia MERABET** | | |
+| **Mohamed BOUYABRI** | | |
+| **Abderrahmane Karim RAKEM** | | |
 
 ## 🏗️ Architecture et Workflow
 
