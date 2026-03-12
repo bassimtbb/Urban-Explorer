@@ -7,4 +7,5 @@ export interface Lieu {
   nom_usuel: string;
   adresse: string;
   coordonnees_geo: CoordonneesGeo;
+  image: string;
 }

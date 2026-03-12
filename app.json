@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "newArchEnabled": false
     },
     "android": {
       "adaptiveIcon": {
@@ -21,15 +22,30 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "newArchEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-camera",
-      "expo-location",
-      "expo-calendar"
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "L'application a besoin d'accéder à l'appareil photo pour vous permettre de prendre une photo de profil."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "L'application a besoin d'accéder à votre position pour vous afficher sur la carte et trouver les lieux à proximité."
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "L'application a besoin d'accéder à votre calendrier pour planifier et retrouver vos prochaines visites."
+        }
+      ]
     ]
   }
 }
