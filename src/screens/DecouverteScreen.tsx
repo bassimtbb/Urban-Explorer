@@ -6,7 +6,6 @@ import { Lieu } from '../types';
 import LieuCard from '../components/LieuCard';
 
 export default function DecouverteScreen() {
-
   const navigation = useNavigation<any>();
 
   const [lieux, setLieux] = useState<Lieu[]>([]);
@@ -19,7 +18,7 @@ export default function DecouverteScreen() {
         const data = await fetchLieux();
         setLieux(data);
       } catch (err) {
-        setError("Erreur lors du chargement des lieux");
+        setError('Erreur lors du chargement des lieux');
       } finally {
         setLoading(false);
       }
@@ -64,7 +63,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
   },
-
   center: {
     flex: 1,
     justifyContent: 'center',
