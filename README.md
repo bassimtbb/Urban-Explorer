@@ -85,7 +85,7 @@ Vous aurez besoin de NodeJS 18+ ou équivalent.
 
 ```bash
 # Clone the repository (si vous l'avez upload sur git)
-git clone https://... 
+git clone https://github.com/bassimtbb/Urban-Explorer.git
 
 # Install dependencies localement
 npm install
