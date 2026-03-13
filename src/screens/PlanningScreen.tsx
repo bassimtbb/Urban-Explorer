@@ -1,4 +1,8 @@
-// 📋 Écran Mes Visites — Liste des planifications
+/**
+ * @file PlanningScreen.tsx
+ * @description Écran centralisant toutes les visites planifiées par l'utilisateur. 
+ * Les données sont tirées du contexte (VisitContext), lui-même relié à AsyncStorage.
+ */
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Image } from 'expo-image';
@@ -6,6 +10,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useVisits } from '../contexts/VisitContext';
 
+/**
+ * Fonction de reformatage de chaîne de date
+ * YYYY-MM-DD vers DD/MM/YYYY
+ */
 const formatDate = (dateStr: string) => {
   const [year, month, day] = dateStr.split('-');
   return `${day}/${month}/${year}`;
@@ -13,9 +21,18 @@ const formatDate = (dateStr: string) => {
 
 export default function PlanningScreen() {
   const navigation = useNavigation<any>();
+  
+  // Utilise les méthodes du VisitContext global pour tirer le tableau d'items planifiés
   const { getAllPlannedVisits, cancelVisit } = useVisits();
+  
+  // Tableau formatté d'objets : [{ date, lieu }, ...]
   const visits = getAllPlannedVisits();
 
+  /**
+   * Identique à l'écran détail, confirme de façon alerte la suppression d'une visite.
+   * La mise à jour est globalisée (via Context) et se répercutera instantanément sur this écran
+   * et AsyncStorage.
+   */
   const handleDelete = (lieuId: string, title: string) => {
     Alert.alert(
       '🗑️ Annuler la visite',
@@ -31,6 +48,7 @@ export default function PlanningScreen() {
     );
   };
 
+  // Traitement d'un Empty State si aucun agenda n'existe
   if (visits.length === 0) {
     return (
       <SafeAreaView style={styles.emptyContainer}>
@@ -46,23 +64,30 @@ export default function PlanningScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <Text style={styles.header}>Mes Visites ({visits.length})</Text>
+      {/* 
+        Utilisation de FlatList pour afficher dynamiquement et de manière optimisée 
+        des structures similaires.
+      */}
       <FlatList
-        data={visits}
+        data={visits} // Les données sont les visites calculées en temps réel par Context
         keyExtractor={(item) => item.lieu.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
+          // Conteneur de la carte de visite avec interaction de navigation
           <TouchableOpacity
             style={styles.row}
             activeOpacity={0.7}
             onPress={() =>
+              // navigation interne paramétrée vers l'onglet StackDetails
+              // `item.lieu` fournit l'intégralité du JSON de ce lieu original
               (navigation as any).navigate('DecouverteStack', {
                 screen: 'Details',
                 params: { lieu: item.lieu },
               })
             }
           >
-            {/* Miniature */}
+            {/* L'image de la visite avec URL Fallbacks (picsum par ID si cover manquante) */}
             <Image
               source={{ uri: item.lieu.cover_url || `https://picsum.photos/100?random=${item.lieu.id}` }}
               style={styles.thumbnail}
@@ -70,7 +95,6 @@ export default function PlanningScreen() {
               contentFit="cover"
             />
 
-            {/* Infos */}
             <View style={styles.info}>
               <Text style={styles.rowTitle} numberOfLines={2}>
                 {item.lieu.title}
@@ -79,13 +103,14 @@ export default function PlanningScreen() {
                 📍 {item.lieu.address_street}
               </Text>
               <View style={styles.dateBadge}>
+                {/* Date convertie en format humain DD/MM/YYYY */}
                 <Text style={styles.dateBadgeText}>
                   🗓️ {formatDate(item.date)}
                 </Text>
               </View>
             </View>
 
-            {/* Bouton supprimer */}
+            {/* Bouton HitSlop de suppression, ne déclenche pas le TouchableOpacity de Navigation  */}
             <TouchableOpacity
               style={styles.deleteBtn}
               onPress={() => handleDelete(item.lieu.id, item.lieu.title)}

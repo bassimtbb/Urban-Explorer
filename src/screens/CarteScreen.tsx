@@ -1,17 +1,26 @@
-// 📋 Tâche de Celia — Écran Carte (Géolocalisation & Marqueurs)
+/**
+ * @file CarteScreen.tsx
+ * @description Écran de gestion de la localisation et affichage des marqueurs sur une carte interactive.
+ * Utilise `expo-location` pour centrer la carte sur la position de l'utilisateur.
+ */
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import { StyleSheet, View, Text, ActivityIndicator, Alert } from 'react-native';
+import MapView, { Marker, Callout, Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import * as Location from 'expo-location';
 import { fetchLieux } from '../services/api';
 import { Lieu } from '../types';
 import { RootStackParamList } from '../navigation/AppNavigator';
 
 type CarteNavigationProp = StackNavigationProp<RootStackParamList, 'Details'>;
 
-const PARIS_REGION = {
+/**
+ * Coordonnées par défaut centrées sur Paris, utilisées comme fallback 
+ * si la géolocalisation de l'utilisateur n'est pas disponible.
+ */
+const PARIS_REGION: Region = {
   latitude: 48.8566,
   longitude: 2.3522,
   latitudeDelta: 0.08,
@@ -21,24 +30,57 @@ const PARIS_REGION = {
 export default function CarteScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<CarteNavigationProp>();
+  
+  // State pour stocker la liste des lieux récupérés depuis l'API
   const [lieux, setLieux] = useState<Lieu[]>([]);
+  // State pour gérer l'affichage du spinner de chargement
   const [isLoading, setIsLoading] = useState(true);
+  // State pour la région affichée sur la carte, initialisée sur Paris
+  const [region, setRegion] = useState<Region>(PARIS_REGION);
 
+  /**
+   * Initialise la carte lors du premier rendu du composant.
+   * Cette fonction gère séquentiellement la demande de permission de localisation,
+   * la récupération de la position de l'utilisateur, et le fetch des lieux depuis l'API.
+   */
   useEffect(() => {
-    const loadLieux = async () => {
+    const initializeMap = async () => {
       try {
+        // Demande de permission à l'utilisateur pour accéder à sa localisation en arrière-plan et au premier plan
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        
+        if (status === 'granted') {
+          // Si accordé, on récupère les coordonnées GPS actuelles
+          const location = await Location.getCurrentPositionAsync({});
+          // Mise à jour de la région de la carte pour centrer sur l'utilisateur
+          setRegion({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.08, // Niveau de zoom approprié
+            longitudeDelta: 0.08,
+          });
+        }
+      } catch (error) {
+        console.error('Erreur de géolocalisation:', error);
+      }
+
+      try {
+        // Appel de la fonction fetchLieux pour interroger l'API Open Data Paris
         const data = await fetchLieux();
+        // Sauvegarde des résultats dans le state `lieux`, déclenchant un re-rendu
         setLieux(data);
       } catch (err) {
         console.error('Erreur chargement carte:', err);
       } finally {
+        // Le chargement est terminé qu'il y ait eu une erreur ou non
         setIsLoading(false);
       }
     };
 
-    loadLieux();
+    initializeMap();
   }, []);
 
+  // Affichage d'un ActivityIndicator pendant la récupération initiale des données
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -50,12 +92,21 @@ export default function CarteScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* 
+        Le composant MapView affiche la carte. 
+        `initialRegion` détermine le centre et le zoom initiaux.
+        `showsUserLocation` affiche le point bleu natif de géolocalisation.
+      */}
       <MapView
         style={styles.map}
-        initialRegion={PARIS_REGION}
+        initialRegion={region}
         showsUserLocation={true}
         showsMyLocationButton={true}
       >
+        {/* 
+          Boucle .map() sur les lieux pour les afficher comme des marqueurs (Marker) sur la carte.
+          Un filtre préalable (.filter) s'assure que le lieu possède bien des coordonnées (lat_lon).
+        */}
         {lieux
           .filter((lieu) => lieu.lat_lon !== null && lieu.lat_lon !== undefined)
           .map((lieu, index) => (
@@ -66,6 +117,11 @@ export default function CarteScreen() {
                 longitude: lieu.lat_lon!.lon,
               }}
             >
+              {/* 
+                Callout personnalisé affiché quand l'utilisateur clique sur le marqueur.
+                Le onPress utilise `navigation.navigate` pour rediriger vers la page Détails,
+                en passant l'objet `lieu` complet comme paramètre (Params) de la route.
+              */}
               <Callout
                 onPress={() =>
                   (navigation as any).navigate('DecouverteStack', {

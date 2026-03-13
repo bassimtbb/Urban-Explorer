@@ -1,76 +1,116 @@
-# 🏙️ Urban Explorer - Paris City Guide
+# 🗼 Urban Explorer - City Guide Paris
 
-## 📖 Présentation
-**Urban Explorer** est une application mobile de type "City Guide" centralisée sur la ville de Paris. 
-Son but principal est pédagogique : elle permet d'apprendre et de démontrer l'intégration robuste de multiples fonctionnalités natives (Caméra, Géolocalisation, Calendrier) au sein d'une application React Native (Expo) moderne.
----
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 
-## 👥 L'Équipe et Répartition des Tâches
+**Urban Explorer** est une application mobile *City Guide* innovante permettant de découvrir les lieux culturels et les événements incontournables de la ville de Paris. L'application exploite en temps réel les données de l'API Open Data de Paris pour offrir une expérience ludique, interactive et géolocalisée.
 
-| Étudiant | Rôle principal | Tâches clés |
-|----------|---------------|-------------|
-| **Bassim TABBEB** | | |
-| **Celia MERABET** | | |
-| **Mohamed BOUYABRI** | | |
-| **Abderrahmane Karim RAKEM** | | |
-
-## 🏗️ Architecture et Workflow
-
-### 🗺️ Navigation
-L'application utilise une approche fluide grâce à `@react-navigation` :
-- **Bottom Tab Navigator** : Utilisé pour la navigation principale, offrant un accès permanent aux sections clés de l'application (*Découverte*, *Carte*, *Mon Profil*).
-- **Stack Navigator** : Intégré sous l'onglet "Découverte", il permet une navigation empilée pour passer de la liste générale des lieux vers un écran de "Détails" spécifique, avec gestion de l'historique de retour.
-
-### 📂 Arborescence du Projet
-Le projet suit une organisation modulaire :
-- `src/screens/` : Contient les écrans plein écran principaux de l'application.
-- `src/components/` : Regroupe les composants graphiques réutilisables (Boutons, Cartes de lieux, etc.).
-- `src/services/` : Isole la logique métier et réseau, notamment les appels API (`api.ts`).
-- `src/types/` : Définit les interfaces TypeScript (`Lieu`, `CoordonneesGeo`) pour garantir un typage strict et sécurisé sur l'ensemble du projet.
-
-## 🔌 Détails de l'API : Open Data Paris
-Nous consommons l'API publique **Open Data de la Ville de Paris**.
-- **Méthode** : Requêtes HTTP `GET` effectuées via `axios`.
-- **Gestion de l'État** : Intégration dans les composants React via le hook `useState` (pour conserver les données et le statut de chargement) et déclenché automatiquement au montage grâce à `useEffect`.
-
-## 📱 Composants Natifs & Permissions
-
-L'application exploite le matériel de l'appareil via les outils Expo :
-
-- **📍 Localisation et Carte** : Intégration experte de `react-native-maps` pour afficher une vue cartographique au sein de laquelle nous plaçons des **marqueurs dynamiques** issus des coordonnées lat/lon fournies par l'API.
-- **📅 Calendrier** : Utilisation de `expo-calendar` permettant aux utilisateurs de synchroniser les dates et de planifier efficacement leurs visites directement dans l'agenda du téléphone.
-- **📸 Caméra** : Déploiement de `expo-camera` dans la section profil pour permettre la capture de selfies, gérant d'abord les prompts de **permissions matérielles** obligatoires côté utilisateur.
-
-## ✨ Bonus Implémentés
-Afin d'offrir une expérience utilisateur Premium, plusieurs atouts ont été codés en supplément :
-- 🌍 **Géolocalisation Utilisateur** : Permet de centrer la carte sur la véritable position de l'utilisateur grâce à `expo-location`.
-- 💾 **Persistance des Données** : Mise en place de `AsyncStorage` pour sauvegarder les préférences utilisateur ou favoris afin d'y accéder même hors connexion.
-- 🎨 **Améliorations UI/UX** : Ajout d'indicateurs de chargement (loaders / `ActivityIndicator`) pendant les appels réseau afin que l'interface reste réactive et compréhensible.
+Ce projet correspond au **TP Final** de développement mobile (React Native / Expo), prouvant l'acquisition et la maîtrise avancée des concepts cruciaux de développement (Architecture, Navigation, Fetching, UX, et APIs Natives).
 
 ---
 
-## 👥 Équipe du Projet
+## 🏗️ Architecture du Projet (Étape 1)
 
-| Rôle | Nom / Pseudonyme | Missions Principales |
-| :--- | :--- | :--- |
-| 📋 **Product Manager** | *À définir* | Conception, spécifications et Product Backlog |
-| 💻 **Lead Developer** | *À définir* | Architecture, intégration Native, API et Typage |
-| 🎨 **UI/UX Designer** | *À définir* | Maquettage, design system et interactions |
+Le projet respecte scrupuleusement les standards de qualité de l'écosystème React Native.
+
+### Découpage Modulaire
+
+Le code source s'organise autour d'un dossier `src/` :
+- 📁 **/screens** : Les écrans de l'application (`Decouverte`, `Carte`, `Details`, `Planning`, `Profil`).
+- 📁 **/components** : Les composants UI réutilisables (`LieuCard`, `ErrorState`, composants Skeleton).
+- 📁 **/services** : La logique métier et réseau externe, notamment `api.ts` (fetch avec Axios).
+- 📁 **/types** : Centralisation des interfaces et des types TypeScript (`index.ts`).
+- 📁 **/contexts** : Gestion d'état global avec React Context (`VisitContext`).
+
+### Système de Navigation
+
+La navigation s'articule via **React Navigation v6** autour de deux paradigmes principaux :
+- **Bottom Tab Navigator** : Le menu principal offrant l'accès racine aux sections "Découverte" (Liste), "Carte" (Map), "Mes Visites" (Planning global), et "Profil" (Avatar / Selfie).
+- **Stack Navigator** : Imbriqué à l'intérieur de l'onglet "Découverte", il prend en charge le parcours *Liste (DecouverteScreen) -> Détails (DetailsScreen)* tout en créant automatiquement les comportements de retour écran (Back button).
 
 ---
 
-## 🚀 Installation et Lancement
+## 🛠️ Spécifications Techniques (Étapes 2 & 3)
 
-Suivez ces étapes pour exécuter le projet sur votre environnement local.
+### 📡 Consommation d'API
+- Intégration de l'**API REST Open Data de Paris** (Dataset *"Que faire à Paris"*).
+- Limitation optimisée à **30 records** fetchés dynamiquement via `axios`.
+- Gestion asynchrone sécurisée par le pattern classique `useState` / `useEffect` :
+  - `isLoading` pour afficher l'attente (ActivityIndicator).
+  - Gestion rigoureuse des cas d'erreur API (`fallbackError`).
 
-1. **Installer les dépendances NPM**
+### 🗺️ Cartographie & Géolocalisation
+- Module **`react-native-maps`** pour le rendu complet du composant Plan.
+- Le viewport par défaut centre la carte sur **Paris**.
+- Les données de lieux ayant des informations GPS formatées (`coordonnees_geo`) sont modélisées interactivement (Points d'intérêts Custom via les `Markers`).
+- La page affiche des Callouts customisables et cliquables permettant de `navigate` avec le `params: lieu`.
+
+### 📅 Planification Interactive
+- Module **`react-native-calendars`** intégré statiquement dans la fiche `<DetailsScreen>`.
+- L'utilisateur peut cliquer un jour à sa convenance pour booker sa visite. 
+- La sélection est transformée en **State local** et transmise au Contexte global pour affichage d'une popup confirmatoire avec date formattée de type DD/MM/YYYY.
+
+### 📸 Multimédia et Avatar
+- Utilisation des APIs directives du Device : **`expo-image-picker`**.
+- La page Profil expose deux boutons pour capturer un « Selfie » interactif en face cam (`CameraType.front`) ou Piocher dans la Galerie photo système.
+- Validation des autorisations utilisateur (`permissions = granted`) de l'OS.
+- L'image résultante est conservée comme « Avatar ».
+
+---
+
+## 🚀 Bonus Implémentés
+
+Pour professionnaliser l'expérience utilisateur, les bonus suivants ont été conçus et prouvés fonctionnels :
+
+1. **🌍 Géolocalisation Live (`expo-location`)**
+   - Demande de permission et capture GPS `getCurrentPositionAsync()`. L'écran `CarteScreen` suit le point bleu nativement de l'utilisateur.
+
+2. **💾 Persistance des Données Local (`AsyncStorage`)**
+   - Implémenté pour assurer qu'une visite *"Planifiée"* dans le `VisitContext` persiste même après redémarrage logiciel de l'application mobile.
+   - Concerne également **l'Avatar Selfie** enregistré !
+
+3. **🔍 Barre de Recherche en Temps Réel**
+   - Hook `useMemo` gérant instantanément les Input de recherche pour filtrer un tableau de données local par `tite` ou `nom_usuel` sans avoir à relancer le Fetch de l'API.
+
+4. **✨ UX Avancée & Skeleton Loaders**
+   - Remplacement des Views banales avec des `ActivityIndicator` natifs.
+   - Présence de Squelettes de charge (Skeletons Animated Loops) et de pages distinctes (`ErrorState`) avec icônes illustrant une API échouée ou un Array vide.
+
+---
+
+## ⚙️ Installation et Lancement Rapide
+
+Vous aurez besoin de NodeJS 18+ ou équivalent.
+
 ```bash
+# Clone the repository (si vous l'avez upload sur git)
+git clone https://... 
+
+# Install dependencies localement
 npm install
-```
 
-2. **Démarrer le serveur de développement Expo**
-```bash
+# Start the Expo Metro Server !
 npx expo start
+# Utilisez votre téléphone caméra (Expo Go) ou pressez "a" pour Android Emulator ou "i" pour Ios Simulator
 ```
 
-*Une fois le serveur lancé, scannez le **QR Code** depuis l'application `Expo Go` sur votre smartphone ou appuyez sur `a` (pour l'émulateur Android) / `i` (pour l'émulateur iOS) depuis votre terminal.*
+### 📦 Dépendances Clés utilisées
+
+```json
+  "@react-native-async-storage/async-storage": "^2.1.2",
+  "@react-navigation/bottom-tabs": "^7.2.0",
+  "@react-navigation/native": "^7.0.14",
+  "@react-navigation/stack": "^7.1.1",
+  "axios": "^1.8.1",
+  "expo": "~52.0.36",
+  "expo-image": "~2.0.6",
+  "expo-image-picker": "~16.0.6",
+  "expo-location": "~18.0.6",
+  "react-native-calendars": "^1.1308.1",
+  "react-native-maps": "1.18.0",
+```
+
+---
+
+*City Guide réalisé avec passion et React Native.* 🗼

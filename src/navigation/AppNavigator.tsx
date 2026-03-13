@@ -1,3 +1,9 @@
+/**
+ * @file AppNavigator.tsx
+ * @description Fichier racine de Configuration du routage avec React Navigation.
+ * Structure l'application en 2 niveaux de hiérarchie : Un BottomTab (Menu bas de l'application principal) 
+ * et Un Stack (Empilement de pages avec bouton retour "Back").
+ */
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,10 +16,10 @@ import ProfilScreen from '../screens/ProfilScreen';
 import PlanningScreen from '../screens/PlanningScreen';
 import DetailsScreen from '../screens/DetailsScreen';
 
-// ----- Types de navigation -----
+// ----- Types de navigation (Strict Typechecking pour interdire les mauvaises routes vers/depuis ces écrans) -----
 export type RootStackParamList = {
-  DecouverteTab: undefined;
-  Details: { lieu: Lieu };
+  DecouverteTab: undefined; // L'écran de base ne nécessite aucun paramètre parent
+  Details: { lieu: Lieu }; // L'écran Détail DOIT obligatoirement recevoir l'objet "lieu" (De la liste des lieux au onPress)
 };
 
 export type BottomTabParamList = {
@@ -23,16 +29,17 @@ export type BottomTabParamList = {
   MonProfil: undefined;
 };
 
-// ----- Stack Navigator (Découverte → Détails) -----
+// ----- Stack Navigator (Le conteneur Découverte → Détails) -----
 const Stack = createStackNavigator<RootStackParamList>();
 
+/**
+ * On "encapsule" (nest) l'écran de Découverte dans un "Stack" avec l'écran Détails.
+ * Cela permet à l'utilisateur de cliquer sur un élément et de naviguer "à l'intérieur" du même onglet,
+ * avec un header retour visuel automatique.
+ */
 const DecouverteStackNavigator = () => {
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: true,
-      }}
-    >
+    <Stack.Navigator screenOptions={{ headerShown: true }}>
       <Stack.Screen
         name="DecouverteTab"
         component={DecouverteScreen}
@@ -47,17 +54,19 @@ const DecouverteStackNavigator = () => {
   );
 };
 
-// ----- Bottom Tab Navigator -----
+// ----- Bottom Tab Navigator (Le conteneur racine avec la barre en bas d'App) -----
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 export default function AppNavigator() {
   return (
     <Tab.Navigator
+      // Options de style appliquées globalement aux 4 différents écrans/onglets
       screenOptions={({ route }) => ({
-        headerShown: false,
+        headerShown: false, // On masque le header natif par défaut
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap = 'ellipse';
 
+          // Mapping : Chaque RootName reçoit un icon statique Vectoriel natif selon son focus
           if (route.name === 'DecouverteStack') {
             iconName = focused ? 'list' : 'list-outline';
           } else if (route.name === 'Carte') {
@@ -83,11 +92,17 @@ export default function AppNavigator() {
         },
       })}
     >
+      {/* 
+        Le premier onglet affiche un Composant "Stack", contenant 2 Ecrans internes.
+      */}
       <Tab.Screen
         name="DecouverteStack"
         component={DecouverteStackNavigator}
         options={{ title: 'Découverte' }}
       />
+      {/* 
+        Les 3 onglets standards dirigent vers les Screens Root/Simples
+      */}
       <Tab.Screen
         name="Carte"
         component={CarteScreen}

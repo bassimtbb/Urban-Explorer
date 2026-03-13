@@ -1,4 +1,8 @@
-// 📋 Tâche de Karim — Écran Détails (Fiche lieu + Calendrier)
+/**
+ * @file DetailsScreen.tsx
+ * @description Écran des détails d'un lieu, présentant ses informations complètes 
+ * (description, contacts) et proposant un Calendrier pour planifier une visite.
+ */
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Linking, TouchableOpacity, Animated, Alert } from 'react-native';
 import { Image } from 'expo-image';
@@ -8,14 +12,18 @@ import { Calendar, DateData } from 'react-native-calendars';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { useVisits } from '../contexts/VisitContext';
 
+// Typage des propriétés de la route attendues par GetParams de react-navigation
 type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
 
 export default function DetailsScreen() {
+  // `useRoute` permet de récupérer l'objet `lieu` passé en paramètre lors de l'appel `navigation.navigate()`
   const route = useRoute<DetailsScreenRouteProp>();
-  const { lieu } = route.params;
+  const { lieu } = route.params; // Objet source venant de la liste des lieux
+  
+  // Custom hook du contexte VisitContext exposant les méthodes de gestion de mémoire (AsyncStorage)
   const { planVisit, cancelVisit, getPlannedDate } = useVisits();
 
-  // --- Image loading ---
+  // State local pour valider le chargement effectif de l'image de couverture avant animation
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const fadeAnim = useState(new Animated.Value(0))[0];
 
@@ -28,15 +36,29 @@ export default function DetailsScreen() {
     }).start();
   };
 
-  // --- Calendrier ---
+  /** --- Gestionnaire du Calendrier --- */
+  
+  // On récupère une éventuelle date de visite pour le lieu actuel
   const existingDate = getPlannedDate(lieu.id);
+  // State pour gérer quelle date est cliquée sur le composant `<Calendar>`
   const [selectedDate, setSelectedDate] = useState(existingDate || '');
 
+  /**
+   * Fonction exécutée au clic sur un jour dans le `<Calendar>`.
+   * Elle met à jour le State local `selectedDate` et utilise la méthode `planVisit`
+   * du contexte pour consigner (persister) cette planification globalement et asynchrone.
+   * @param day Objet formaté provenant du composant Calendar
+   */
   const handleDayPress = (day: DateData) => {
     setSelectedDate(day.dateString);
     planVisit(lieu.id, day.dateString, lieu);
   };
 
+  /**
+   * Logique de suppression d'une visite.
+   * Utilise `Alert.alert` (module natif) pour exiger une confirmation utilisateur.
+   * Mettra à jour le Contexte (`cancelVisit`) et réinitialisera l'UI Calendrier (`setSelectedDate('')`).
+   */
   const handleDeletePlanification = () => {
     Alert.alert(
       '🗑️ Annuler la visite',
@@ -47,14 +69,17 @@ export default function DetailsScreen() {
           text: 'Oui, annuler',
           style: 'destructive',
           onPress: () => {
-            cancelVisit(lieu.id);
-            setSelectedDate('');
+            cancelVisit(lieu.id); // Suppression du Global Storage (AsyncStorage derrière)
+            setSelectedDate('');  // Mise à jour de l'UI (Désélection visuelle de la date)
           },
         },
       ]
     );
   };
 
+  /** 
+   * Fonction simple pour formater temporellement YYYY-MM-DD => DD/MM/YYYY 
+   * */
   const formatDate = (dateStr: string) => {
     const [year, month, dayNum] = dateStr.split('-');
     return `${dayNum}/${month}/${year}`;
@@ -63,11 +88,13 @@ export default function DetailsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* ===== Image de couverture ===== */}
+        
+        {/* Affichage adaptatif de l'image de couverture si elle est communiquée par l'API */}
         {lieu.cover_url ? (
           <View style={styles.imageWrapper}>
             {!isImageLoaded && <View style={styles.imageSkeleton} />}
             <Animated.View style={[styles.imageContainer, { opacity: isImageLoaded ? fadeAnim : 0 }]}>
+              {/* Le composant Image d'expo-image gère efficacement un cache persistant lourd pour ne pas retélécharger la ressource */}
               <Image
                 source={{ uri: lieu.cover_url }}
                 style={styles.image}
@@ -79,7 +106,6 @@ export default function DetailsScreen() {
           </View>
         ) : null}
 
-        {/* ===== Informations du lieu ===== */}
         <View style={styles.content}>
           <Text style={styles.title}>{lieu.title}</Text>
 
@@ -107,6 +133,7 @@ export default function DetailsScreen() {
             </Text>
           ) : null}
 
+          {/* S'il y a un lien direct vers l'office du tourisme de Paris, utilisation du `Linking` natif */}
           {lieu.contact_url ? (
             <TouchableOpacity
               style={styles.linkButton}
@@ -116,10 +143,13 @@ export default function DetailsScreen() {
             </TouchableOpacity>
           ) : null}
 
-          {/* ===== Section Calendrier ===== */}
           <View style={styles.calendarSection}>
             <Text style={styles.calendarTitle}>📅 Planifier une visite</Text>
-
+            
+            {/* 
+              Module Calendrier Custom permettant la programmation d'évènements.
+              `markedDates` indique au calendrier quel jour est affiché en subrillance.
+            */}
             <Calendar
               onDayPress={handleDayPress}
               markedDates={
@@ -142,7 +172,7 @@ export default function DetailsScreen() {
                 selectedDayTextColor: '#ffffff',
                 dotColor: '#00adf5',
                 monthTextColor: '#1C1C1E',
-                textMonthFontWeight: '700',
+                textMonthFontWeight: '700', // Chaîne de caractères string : compatible nouvelle architecture (Fabric)
                 textDayHeaderFontWeight: '600',
                 textDayFontSize: 15,
                 textMonthFontSize: 17,
@@ -151,6 +181,10 @@ export default function DetailsScreen() {
               style={styles.calendar}
             />
 
+            {/* 
+              Ternaire : Si une date est enregistrée, on remplace le "Hint" par 
+              un Box Confirmatoire validant la planification (persistance AsyncStorage validée ou chargée).
+            */}
             {selectedDate ? (
               <>
                 <View style={styles.confirmationBox}>
@@ -161,6 +195,7 @@ export default function DetailsScreen() {
                   </Text>
                 </View>
 
+                {/* Bouton de suppression de la planification */}
                 <TouchableOpacity
                   style={styles.deleteButton}
                   onPress={handleDeletePlanification}
@@ -206,7 +241,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: '700', // Important: String type pour compatible Fabric framework
     color: '#1C1C1E',
     marginBottom: 12,
   },
